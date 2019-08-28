@@ -12,8 +12,7 @@ var config = {
       'User-Agent': 'my-reddit-client'
     }
   },
-  domain: 'http://api.edutour.vn'
-  // domain: 'http://localhost:3100'
+  domain: 'http://localhost:3100'
 }
 
 module.exports = config

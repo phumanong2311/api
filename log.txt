@@ -1,6 +1,0 @@
-
-info [Tue Aug 27 2019 16:34:25 GMT+0700 (GMT+07:00)]  start server 3100 success
-
-info [Tue Aug 27 2019 16:57:48 GMT+0700 (GMT+07:00)]  start server 3100 success
-
-info [Tue Aug 27 2019 17:01:13 GMT+0700 (GMT+07:00)]  start server 3100 success
