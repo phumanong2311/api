@@ -62,7 +62,10 @@ module.exports = (app) => {
       })
 
       app.get('/', (req, res) => {
-        res.send('server is ready')
+        Models.User.find({}, (err, data) => {
+          if (err) return res.send('connect mongo fail')
+          else res.send(data)
+        })
       })
 
       app.get('/getToken', autController.getToken)
