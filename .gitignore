@@ -1,8 +1,0 @@
-# Node rules:
-
-## Dependency directory
-## Commenting this out is preferred by some people, see
-node_modules
-src
-package-lock.json
-.env
