@@ -1,35 +1,28 @@
 var async = require('async')
 var ObjectId = require('mongoose').Types.ObjectId
 
-var authUser = require('../../controller/authenticate/autuser')
 var utility = require('../../helper/utility')
 const Models = require('../../model/mongo')
-const {Role} = Models
+const { Post } = Models
 
 module.exports = function (router) {
-  router.get('/roles', (req, res) => {
+  router.get('/post', (req, res) => {
     try {
-      Role.find({ isActive: true, isDelete: false }, (error, data) => {
-        if (error) return utility.apiResponse(res, 500, error.toString())
-        return utility.apiResponse(res, 200, 'success', data)
-      })
-    } catch (error) { utility.apiResponse(res, 500, error.toString()) }
-  })
-  router.get('/role', authUser.checkTokenAdmin, (req, res) => {
-    try {
-      const {strKey, isDelete, pageSize, pageNumber, colSort, typeSort} = req.query
+      const { strKey, isDelete, pageSize, pageNumber, colSort, typeSort } = req.query
       const query = {}
-      const sort = colSort && typeSort ? { [colSort]: typeSort === 'asc' ? 1 : -1 } : null
+      const sort = colSort && typeSort ? {
+        [colSort]: typeSort === 'asc' ? 1 : -1
+      } : null
       if (strKey) { query['$text'] = { $search: strKey } }
       query['isDelete'] = isDelete === 'true'
       const total = (cb) => {
-        Role.count(query, (err, data) => cb(err, data))
+        Post.count(query, (err, data) => cb(err, data))
       }
 
       const list = (cb) => {
         let skip = parseInt(pageSize) * (parseInt(pageNumber) - 1)
         let limit = parseInt(pageSize)
-        Role.find(query, (err, categories) => cb(err, categories)).skip(skip).limit(limit).sort(sort)
+        Post.find(query, (err, dt) => cb(err, dt)).skip(skip).limit(limit).sort(sort)
       }
 
       async.parallel({ total, list }, (error, data) => {
@@ -39,41 +32,43 @@ module.exports = function (router) {
     } catch (error) { utility.apiResponse(res, 500, error.toString(), null) }
   })
 
-  router.get('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.get('/post/:id', (req, res) => {
     try {
-      let {id} = req.params
-      Role.findOne({_id: ObjectId(id)}, (error, data) => {
+      let { id } = req.params
+      Post.findOne({ _id: ObjectId(id) }, (error, data) => {
         if (error) return utility.apiResponse(res, 500, error.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
     } catch (error) { return utility.apiResponse(res, 500, error, null) }
   })
 
-  router.post('/role', authUser.checkTokenAdmin, (req, res) => {
+  router.post('/post', (req, res) => {
     try {
       let data = req.body
-      let role = new Role(data)
-      const error = role.validateSync()
+      data['isDelete'] = false
+      let post = new Post(data)
+      var error = post.validateSync()
 
       if (error) {
         var errorKeys = Object.keys(error.errors)
         return utility.apiResponse(res, 500, error.errors[errorKeys[0].message].toString())
       }
 
-      role.save((err, data) => {
+      post.save((err, data) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
     } catch (e) {
+      console.log(e)
       return utility.apiResponse(res, 500, 'server error')
     }
   })
 
-  router.put('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.put('/post/:id', (req, res) => {
     try {
       let field = req.body
       delete field.id
-      Role.findOneAndUpdate({ _id: ObjectId(req.params.id) }, field, {new: true}, (err, data) => {
+      Post.findOneAndUpdate({ _id: ObjectId(req.params.id) }, field, { new: true }, (err, data) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
@@ -82,10 +77,10 @@ module.exports = function (router) {
     }
   })
 
-  router.delete('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.delete('/post/:id', (req, res) => {
     try {
       var { id } = req.params
-      Role.deleteOne({_id: ObjectId(id)}, (err) => {
+      Post.deleteOne({ _id: ObjectId(id) }, (err) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', true)
       })

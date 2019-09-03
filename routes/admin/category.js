@@ -1,21 +1,20 @@
 var async = require('async')
 var ObjectId = require('mongoose').Types.ObjectId
 
-var authUser = require('../../controller/authenticate/autuser')
 var utility = require('../../helper/utility')
 const Models = require('../../model/mongo')
-const {Role} = Models
+const {Category} = Models
 
 module.exports = function (router) {
-  router.get('/roles', (req, res) => {
+  router.get('/categories', (req, res) => {
     try {
-      Role.find({ isActive: true, isDelete: false }, (error, data) => {
+      Category.find({ isActive: true, isDelete: false }, (error, data) => {
         if (error) return utility.apiResponse(res, 500, error.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
     } catch (error) { utility.apiResponse(res, 500, error.toString()) }
   })
-  router.get('/role', authUser.checkTokenAdmin, (req, res) => {
+  router.get('/category', (req, res) => {
     try {
       const {strKey, isDelete, pageSize, pageNumber, colSort, typeSort} = req.query
       const query = {}
@@ -23,13 +22,13 @@ module.exports = function (router) {
       if (strKey) { query['$text'] = { $search: strKey } }
       query['isDelete'] = isDelete === 'true'
       const total = (cb) => {
-        Role.count(query, (err, data) => cb(err, data))
+        Category.count(query, (err, data) => cb(err, data))
       }
 
       const list = (cb) => {
         let skip = parseInt(pageSize) * (parseInt(pageNumber) - 1)
         let limit = parseInt(pageSize)
-        Role.find(query, (err, categories) => cb(err, categories)).skip(skip).limit(limit).sort(sort)
+        Category.find(query, (err, categories) => cb(err, categories)).skip(skip).limit(limit).sort(sort)
       }
 
       async.parallel({ total, list }, (error, data) => {
@@ -39,28 +38,28 @@ module.exports = function (router) {
     } catch (error) { utility.apiResponse(res, 500, error.toString(), null) }
   })
 
-  router.get('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.get('/category/:id', (req, res) => {
     try {
       let {id} = req.params
-      Role.findOne({_id: ObjectId(id)}, (error, data) => {
+      Category.findOne({_id: ObjectId(id)}, (error, data) => {
         if (error) return utility.apiResponse(res, 500, error.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
     } catch (error) { return utility.apiResponse(res, 500, error, null) }
   })
 
-  router.post('/role', authUser.checkTokenAdmin, (req, res) => {
+  router.post('/category', (req, res) => {
     try {
-      let data = req.body
-      let role = new Role(data)
-      const error = role.validateSync()
+      let dt = req.body
+      let category = new Category(dt)
+      var error = category.validateSync()
 
       if (error) {
         var errorKeys = Object.keys(error.errors)
         return utility.apiResponse(res, 500, error.errors[errorKeys[0].message].toString())
       }
 
-      role.save((err, data) => {
+      category.save((err, data) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
@@ -69,11 +68,11 @@ module.exports = function (router) {
     }
   })
 
-  router.put('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.put('/category/:id', (req, res) => {
     try {
       let field = req.body
       delete field.id
-      Role.findOneAndUpdate({ _id: ObjectId(req.params.id) }, field, {new: true}, (err, data) => {
+      Category.findOneAndUpdate({ _id: ObjectId(req.params.id) }, field, {new: true}, (err, data) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', data)
       })
@@ -82,10 +81,10 @@ module.exports = function (router) {
     }
   })
 
-  router.delete('/role/:id', authUser.checkTokenAdmin, (req, res) => {
+  router.delete('/category/:id', (req, res) => {
     try {
       var { id } = req.params
-      Role.deleteOne({_id: ObjectId(id)}, (err) => {
+      Category.deleteOne({_id: ObjectId(id)}, (err) => {
         if (err) return utility.apiResponse(res, 500, err.toString())
         return utility.apiResponse(res, 200, 'success', true)
       })
