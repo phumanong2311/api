@@ -2,7 +2,7 @@ var config = {
   mongoDB: {
     connect: 'mongodb://localhost:27017/TA'
   },
-  allowedOrigins: ['http://localhost:3030', 'http://localhost:3000', 'http://wland.vn'],
+  allowedOrigins: ['http://localhost:3030', 'http://localhost:3000', 'http://wland.vn', 'http://edutour.vn', 'http://admin.edutour.vn'],
   options: {
     host: 'localhost',
     path: '/',
