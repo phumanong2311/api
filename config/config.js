@@ -1,8 +1,8 @@
 var config = {
   mongoDB: {
-    connect: 'mongodb://localhost:27017/TA'
+    connect: 'mongodb://localhost:27017/ODU'
   },
-  allowedOrigins: ['http://localhost:3030', 'http://localhost:3000', 'http://wland.vn', 'http://edutour.vn', 'http://admin.edutour.vn'],
+  allowedOrigins: ['http://localhost:3200', 'http://localhost:3300'],
   options: {
     host: 'localhost',
     path: '/',
@@ -12,7 +12,7 @@ var config = {
       'User-Agent': 'my-reddit-client'
     }
   },
-  domain: 'http://api.edutour.vn'
+  domain: 'http://localhost:3100'
 }
 
 module.exports = config

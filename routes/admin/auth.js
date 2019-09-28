@@ -76,12 +76,15 @@ module.exports = (router) => {
 
   router.put('/user/:id/profile', authUser.checkTokenAdmin, (req, res) => {
     try {
-      const arrKeys = ['avatar', 'firstname', 'lastname', 'gender', 'phone', 'address', 'birthday']
+      const arrKeys = ['avatar', 'firstname', 'lastname', 'gender', 'phone', 'address', 'birthdate']
+      
       const field = req.body
       const isValid = Object.keys(field).every(el => arrKeys.includes(el))
+      if (req.userId.toString() !== req.params.id.toString()) return utility.apiResponse(res, 500, 'User isValid!!!')
 
       if (!isValid) return utility.apiResponse(res, 500, 'Server Update Profile isValid!!!')
 
+      if (field.birthdate) field.birthdate = new Date(field.birthdate)
       const tokenFn = (cb) => Models.Token.findOne({ token: req.token, userId: req.params.id }, cb)
 
       const userFn = (tokenData, cb) => {
@@ -100,6 +103,32 @@ module.exports = (router) => {
       return utility.apiResponse(res, 500, 'Server error')
     }
   })
+
+  router.put('/change-password', authUser.checkTokenAdmin, (req, res) => {
+    try {
+      const arrKeys = ['password', 'confirmPassword']
+      const field = req.body
+      const isValid = Object.keys(field).every(el => arrKeys.includes(el))
+
+      // if (req.userId !== req.params.id) return utility.apiResponse(res, 500, 'User isValid!!!')
+
+      if (!isValid) return utility.apiResponse(res, 500, 'info invalid isValid!!!')
+
+      const {password, confirmPassword} = field
+
+      if (!password) return utility.apiResponse(res, 500, 'password is not empty !!!')
+
+      if (password !== confirmPassword) return utility.apiResponse(res, 500, 'confirm password is not match !!!')
+
+      Models.User.findOneAndUpdate({ _id: ObjectId(req.userId) }, field, {new: true}, (err, user) => {
+        if (err) return utility.apiResponse(res, 500, err.toString())
+        return utility.apiResponse(res, 200, 'success', true)
+      })
+
+    } catch (error) {
+      return utility.apiResponse(res, 500, 'Server error')
+    }
+  })
 }
 
 const addRoleUser = (user, token, callback) => {
@@ -107,6 +136,7 @@ const addRoleUser = (user, token, callback) => {
     var data = {
       token: token,
       _id: user._id,
+      avatar: user.avatar,
       roleId: user.roleId,
       username: user.username,
       email: user.email,
@@ -120,7 +150,8 @@ const addRoleUser = (user, token, callback) => {
       createDate: user.createDate,
       activeDate: user.activeDate,
       isDelete: user.isDelete,
-      isActive: user.isActive
+      isActive: user.isActive,
+      phone: user.phone
     }
     if (err) return callback(null, data)
     data.permissions = hasPermissions(role.permissions)

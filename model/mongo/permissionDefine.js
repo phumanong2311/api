@@ -4,14 +4,9 @@ const {Schema} = mongoose
 
 const model = new Schema({
   title: { type: String, trim: true, required: true },
-  img: { type: String, trim: true },
-  link: { type: String, trim: true },
-  description: { type: String, trim: true },
-  order: { type: Number, trim: true },
-  parentId: { type: Schema.Types.ObjectId, trim: true },
+  children: {type: Array},
   isActive: { type: Boolean, default: false },
   isDelete: { type: Boolean, default: false },
-  isHome: { type: Boolean, default: false },
   activeDate: { type: Date, default: Date.now() },
   createDate: { type: Date, default: Date.now() },
   updateDate: { type: Date, default: Date.now() }
@@ -27,4 +22,4 @@ model.index({
   }
 })
 
-module.exports = mongoose.model('category', model)
+module.exports = mongoose.model('permissionDefine', model)
