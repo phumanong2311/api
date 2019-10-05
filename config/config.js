@@ -1,6 +1,6 @@
 var config = {
   mongoDB: {
-    connect: 'mongodb://localhost:27017/ODU'
+    connect: 'mongodb://localhost:27017/IKM'
   },
   allowedOrigins: ['http://localhost:3200', 'http://localhost:3300'],
   options: {
@@ -12,7 +12,7 @@ var config = {
       'User-Agent': 'my-reddit-client'
     }
   },
-  domain: 'http://localhost:3100'
+  domain: 'http://localhost:3101'
 }
 
 module.exports = config
